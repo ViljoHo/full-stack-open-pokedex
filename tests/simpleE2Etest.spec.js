@@ -7,3 +7,5 @@ describe('Pokedex', () => {
     await expect(page.getByText('Pokémon and Pokémon character names are trademarks of Nintendo.')).toBeVisible()
   })
 })
+
+// continue exercise 11.9 'Once the pipeline works...'
