@@ -41,15 +41,6 @@ jobs:
       - name: Trigger deployment
         if: ${{ github.event_name == 'push' && env.CONDITION == 'false' }}
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
-      - name: Notify discord
-        if: ${{ github.event_name == 'push' && env.CONDITION == 'false' }}
-        uses: rjstone/discord-webhook-notify@v2
-        with:
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-          username: 'Pipeline'
-          severity: 'info'
-          title: 'New version deployed successfully!'
-          description: 'Deployment triggered for commit ${{ github.sha }}.'
   tag_release:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
@@ -64,3 +55,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch
+  discord_notify:
+    needs: [simple_deployment_pipeline, tag_release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify discord
+        if: ${{ github.event_name == 'push' && env.CONDITION == 'false' }}
+        uses: rjstone/discord-webhook-notify@v2
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          username: 'Pipeline'
+          severity: 'info'
+          title: 'New version deployed successfully!'
+          description: 'Deployment triggered for commit ${{ github.sha }}.'
